@@ -1,0 +1,275 @@
+{% extends 'students/base.html' %}
+{% load static %}
+
+{% block title %}Add Student – Recruit Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ─── Page‑specific enhancements ─────────── */
+    .page-section {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(201,168,76,0.15);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-gold), var(--shadow-sm);
+        overflow: hidden;
+        transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+        animation: fadeInUp 0.5s var(--ease-out) both;
+    }
+
+    .form-card:hover {
+        box-shadow: var(--shadow-gold), var(--shadow-md);
+    }
+
+    .form-card-header {
+        background: linear-gradient(105deg, rgba(246,245,241,0.7) 0%, rgba(255,255,255,0.8) 100%);
+        border-bottom: 1px solid var(--surface-3);
+        padding: 1.75rem 2rem;
+    }
+
+    .form-card-header h4 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        color: var(--ink);
+        margin-bottom: 0;
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-card-body {
+        padding: 2rem;
+    }
+
+    /* ─── Form field styling ─────────────────── */
+    .custom-form-label {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .custom-form-label .required-star {
+        color: var(--red);
+        margin-left: 2px;
+    }
+
+    .custom-form-input,
+    .custom-form-select {
+        width: 100%;
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius);
+        padding: 0.7rem 1rem;
+        font-size: 0.92rem;
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        color: var(--ink);
+        transition: all 0.2s;
+        font-family: var(--font-body);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .custom-form-input:focus,
+    .custom-form-select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 4px rgba(201,168,76,0.08);
+        outline: none;
+        background: rgba(255,255,255,0.95);
+    }
+
+    .custom-form-input:hover,
+    .custom-form-select:hover {
+        border-color: var(--ink-soft);
+    }
+
+    .form-error {
+        font-size: 0.8rem;
+        color: var(--red);
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .help-text {
+        font-size: 0.78rem;
+        color: var(--ink-ghost);
+        margin-top: 0.3rem;
+    }
+
+    /* ─── Action buttons ─────────────────────── */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: 1px solid var(--surface-3);
+        color: var(--ink-soft);
+        font-weight: 500;
+        padding: 0.65rem 1.6rem;
+        border-radius: var(--radius);
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .btn-cancel:hover {
+        background: var(--surface-2);
+        color: var(--ink);
+        border-color: var(--surface-3);
+    }
+
+    /* ─── Status guide card ──────────────────── */
+    .guide-card {
+        margin-top: 2rem;
+        background: rgba(255,255,255,0.65);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem 1.5rem;
+        box-shadow: var(--shadow-sm);
+        animation: fadeInUp 0.5s 0.15s var(--ease-out) both;
+    }
+
+    .guide-title {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        color: var(--ink);
+    }
+
+    .guide-list {
+        list-style: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.3rem 1.5rem;
+        padding: 0;
+        margin: 0;
+        font-size: 0.84rem;
+    }
+
+    .guide-list li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4rem;
+        color: var(--ink-soft);
+    }
+
+    .guide-badge {
+        font-size: 0.75rem;
+        width: 1.2rem;
+        text-align: center;
+    }
+
+    @media (max-width: 500px) {
+        .form-card-body {
+            padding: 1.5rem;
+        }
+        .guide-list {
+            grid-template-columns: 1fr;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+        .btn-cancel {
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- ═══════════ PAGE HEADING ═══════════════════════════════ -->
+<div class="page-section text-center mb-4">
+    <p class="eyebrow" style="font-family: var(--font-mono); font-size:0.75rem; letter-spacing:0.08em; color: var(--gold-dark); text-transform:uppercase; margin-bottom:0.25rem;">Recruitment</p>
+    <h1 style="font-family: var(--font-display); font-size:2rem; color: var(--ink); margin-bottom:0.3rem;">✨ Register new student</h1>
+    <p style="color: var(--ink-soft); font-size:0.95rem;">Fill in the details below to add a new prospective student to the pipeline.</p>
+</div>
+
+<!-- ═══════════ FORM CARD ═════════════════════════════════ -->
+<div class="form-card">
+    <div class="form-card-header">
+        <h4>
+            <span>➕</span> Student information
+        </h4>
+    </div>
+    <div class="form-card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="custom-form-label">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="required-star">*</span>{% endif %}
+                </label>
+
+                {% if field.field.widget.input_type == 'select' or field.field.widget.input_type == 'choice' %}
+                    <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="custom-form-select">
+                        {% for option in field %}
+                            {{ option }}
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                           name="{{ field.name }}" 
+                           id="{{ field.id_for_label }}" 
+                           class="custom-form-input"
+                           value="{{ field.value|default:'' }}"
+                           placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}">
+                {% endif %}
+
+                {% if field.help_text %}
+                    <div class="help-text">{{ field.help_text }}</div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <div class="form-error">
+                        <span>⚠️</span> {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <a href="{% url 'students:list' %}" class="btn-cancel">
+                    ← Back to list
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    💾 Save student
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ═══════════ STATUS GUIDE ═══════════════════════════════ -->
+<div class="guide-card">
+    <h6 class="guide-title">📌 Quick status reference</h6>
+    <ul class="guide-list">
+        <li><span class="guide-badge">🟡</span> <strong>New Lead</strong> – Just submitted</li>
+        <li><span class="guide-badge">🔵</span> <strong>Contacted</strong> – Recruiter reached out</li>
+        <li><span class="guide-badge">🟢</span> <strong>Enrolled</strong> – Joined a course</li>
+        <li><span class="guide-badge">🔴</span> <strong>Lost</strong> – Not moving forward</li>
+    </ul>
+</div>
+
+{% endblock %}

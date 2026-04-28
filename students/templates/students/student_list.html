@@ -1,0 +1,437 @@
+{% extends 'students/base.html' %}
+{% load static %}
+
+{% block title %}Student Pipeline – Recruit Dashboard{% endblock %}
+
+{% block content %}
+<!-- ═══════════════ EXTRA STYLES (for this page only) ═══════ -->
+<style>
+    /* ─── Page Hero Card ───────────────────────── */
+    .page-hero-card {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        background: linear-gradient(105deg, rgba(233, 185, 185, 0.8) 0%, rgba(231, 216, 156, 0.9) 100%);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(201,168,76,0.18);
+        border-radius: var(--radius-xl);
+        padding: 2.5rem 2.25rem;
+        margin-bottom: 2.25rem;
+        box-shadow: var(--shadow-gold), var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -10%;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .title-group .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gold-dark);
+        margin-bottom: 0.4rem;
+    }
+
+    .title-group h1 {
+        font-family: var(--font-display);
+        font-size: 2.1rem;
+        font-weight: 400;
+        color: var(--ink);
+        line-height: 1.15;
+        margin-bottom: 0.65rem;
+    }
+
+    .title-group p {
+        color: var(--ink-soft);
+        font-size: 0.95rem;
+        max-width: 540px;
+        line-height: 1.65;
+    }
+
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.75rem 1.6rem;
+        background: var(--accent-gradient);
+        color: #0e0f11;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-radius: var(--radius);
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(201,168,76,0.25);
+        transition: all 0.25s var(--ease-in-out);
+        white-space: nowrap;
+    }
+
+    .btn-hero:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(201,168,76,0.35);
+        background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+        color: #0e0f11;
+    }
+
+    /* ─── Toolbar Card ─────────────────────────── */
+    .toolbar-card {
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .toolbar-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 1.25rem;
+        align-items: end;
+    }
+
+    .toolbar-grid label {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
+    .toolbar-grid input,
+    .toolbar-grid select {
+        width: 100%;
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius);
+        padding: 0.65rem 0.9rem;
+        font-size: 0.88rem;
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        transition: all 0.2s;
+    }
+
+    .toolbar-grid input:focus,
+    .toolbar-grid select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        outline: none;
+    }
+
+    .toolbar-actions {
+        display: flex;
+        gap: 0.65rem;
+        align-items: center;
+    }
+
+    .toolbar-pill-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.2rem;
+    }
+
+    .toolbar-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        padding: 0.3rem 0.9rem;
+        border-radius: 50px;
+        background: rgba(201,168,76,0.08);
+        border: 1px solid rgba(201,168,76,0.2);
+        color: var(--gold-dark);
+        font-size: 0.78rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .toolbar-pill:hover {
+        background: rgba(201,168,76,0.16);
+        border-color: var(--gold);
+        color: var(--ink);
+    }
+
+    /* ─── Table enhancements ───────────────────── */
+    .table tbody td {
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover td {
+        background: rgba(201,168,76,0.04);
+    }
+
+    /* status badges inherit from base, but we refine spacing */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        padding: 0.3em 0.8em;
+        border-radius: 20px;
+    }
+
+    .badge-new {
+        background: rgba(201,168,76,0.12);
+        color: #5c4a1a;
+        border: 1px solid rgba(201,168,76,0.2);
+    }
+    .badge-contacted {
+        background: rgba(76,126,201,0.1);
+        color: #1a3a5c;
+        border: 1px solid rgba(76,126,201,0.2);
+    }
+    .badge-interviewing {
+        background: rgba(102,51,153,0.08);
+        color: #2d1b4e;
+        border: 1px solid rgba(102,51,153,0.2);
+    }
+    .badge-accepted {
+        background: rgba(76,170,114,0.12);
+        color: #1a5c38;
+        border: 1px solid rgba(76,170,114,0.2);
+    }
+    .badge-rejected {
+        background: rgba(201,76,76,0.1);
+        color: #5c1a1a;
+        border: 1px solid rgba(201,76,76,0.2);
+    }
+
+    /* course interest badges */
+    .badge-course {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        padding: 0.4em 0.95em;
+        border-radius: 6px;
+        font-weight: 500;
+        border: 1px solid transparent;
+    }
+
+    .badge-course-web {
+        background: linear-gradient(135deg, rgba(100,200,255,0.15) 0%, rgba(76,126,201,0.1) 100%);
+        color: #1a4a7a;
+        border-color: rgba(76,126,201,0.3);
+    }
+
+    .badge-course-data {
+        background: linear-gradient(135deg, rgba(255,150,100,0.15) 0%, rgba(230,100,50,0.1) 100%);
+        color: #5c3a1a;
+        border-color: rgba(230,100,50,0.3);
+    }
+
+    .badge-course-design {
+        background: linear-gradient(135deg, rgba(200,100,255,0.15) 0%, rgba(150,76,201,0.1) 100%);
+        color: #3a1a5c;
+        border-color: rgba(150,76,201,0.3);
+    }
+
+    .badge-course-devops {
+        background: linear-gradient(135deg, rgba(76,201,120,0.15) 0%, rgba(76,170,114,0.1) 100%);
+        color: #1a5c38;
+        border-color: rgba(76,170,114,0.3);
+    }
+
+    .badge-course-product {
+        background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.1) 100%);
+        color: #5c4a1a;
+        border-color: rgba(201,168,76,0.3);
+    }
+
+    /* ─── Empty state ──────────────────────────── */
+    .empty-state-cell {
+        padding: 3rem 1.5rem;
+        text-align: center;
+    }
+    .empty-state-illustration {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
+    }
+    .empty-state-title {
+        font-family: var(--font-display);
+        font-size: 1.3rem;
+        margin-bottom: 0.3rem;
+        color: var(--ink);
+    }
+    .empty-state-text {
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+        margin-bottom: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+        .page-hero-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .toolbar-grid {
+            grid-template-columns: 1fr;
+        }
+        .toolbar-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- ═══════════════ HERO SECTION ════════════════════════════ -->
+<div class="page-hero-card">
+    <div class="title-group">
+        <p class="eyebrow">Student pipeline</p>
+        <h1>📊 Student applications</h1>
+        <p>Track student interest, course preferences, and application status from a single dashboard.</p>
+        <p class="text-muted" style="margin-top: 0.35rem; font-weight: 500;">
+            🧑‍🎓 {{ total_count }} student{{ total_count|pluralize }} in pipeline
+        </p>
+    </div>
+    <a href="{% url 'students:add' %}" class="btn-hero">
+        <span aria-hidden="true">＋</span> Add new student
+    </a>
+</div>
+
+<!-- ═══════════════ TOOLBAR ════════════════════════════════ -->
+<div class="toolbar-card">
+    <form method="get" class="toolbar-grid">
+        <div>
+            <label for="q">🔍 Search by name or email</label>
+            <input type="search" id="q" name="q" value="{{ query }}" placeholder="e.g. shinoy, rishika...">
+        </div>
+        <div>
+            <label for="course_interest">📚 Course interest</label>
+            <select id="course_interest" name="course_interest">
+                <option value="">All courses</option>
+                {% for value, label in course_choices %}
+                    <option value="{{ value }}"{% if value == course_interest %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="toolbar-actions">
+            <button type="submit" class="btn btn-primary">
+                🔎 Apply filters
+            </button>
+            {% if query or course_interest %}
+            <a href="{% url 'students:list' %}" class="btn btn-outline-secondary">
+                ✕ Clear filters
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="toolbar-pill-list">
+        <span style="font-size: 0.75rem; color: var(--ink-ghost); margin-right: 0.5rem;">Quick course:</span>
+        {% for value, label in course_choices|slice:':5' %}
+            <a href="?course_interest={{ value }}" class="toolbar-pill">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    {% if query or course_interest %}
+    <p class="text-muted" style="margin-top: 1rem; margin-bottom: 0; font-size: 0.85rem;">
+        🔎 Showing results{% if query %} for “<strong>{{ query }}</strong>”{% endif %}
+        {% if query and course_interest %} in {% endif %}
+        {% if course_interest %}<strong>{{ course_interest_label }}</strong>{% endif %}.
+    </p>
+    {% endif %}
+</div>
+
+<!-- ═══════════════ STUDENTS TABLE ═════════════════════════ -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Course Interest</th>
+                        <th>Status</th>
+                        <th>Added On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ student.name }}</strong></td>
+                        <td>{{ student.email }}</td>
+                        <td>
+                            {% if student.course_interest == 'web_development' %}
+                                <span class="badge-course badge-course-web">💻 {{ student.get_course_interest_display }}</span>
+                            {% elif student.course_interest == 'data_science' %}
+                                <span class="badge-course badge-course-data">📊 {{ student.get_course_interest_display }}</span>
+                            {% elif student.course_interest == 'ux_design' %}
+                                <span class="badge-course badge-course-design">🎨 {{ student.get_course_interest_display }}</span>
+                            {% elif student.course_interest == 'devops' %}
+                                <span class="badge-course badge-course-devops">⚙️ {{ student.get_course_interest_display }}</span>
+                            {% elif student.course_interest == 'product_management' %}
+                                <span class="badge-course badge-course-product">📈 {{ student.get_course_interest_display }}</span>
+                            {% else %}
+                                <span class="badge-course">{{ student.get_course_interest_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if student.status == 'new' %}
+                                <span class="status-badge badge-new">🟡 New</span>
+                            {% elif student.status == 'contacted' %}
+                                <span class="status-badge badge-contacted">🔵 Contacted</span>
+                            {% elif student.status == 'interviewing' %}
+                                <span class="status-badge badge-interviewing">🟣 Interviewing</span>
+                            {% elif student.status == 'accepted' %}
+                                <span class="status-badge badge-accepted">🟢 Accepted</span>
+                            {% elif student.status == 'rejected' %}
+                                <span class="status-badge badge-rejected">🔴 Rejected</span>
+                            {% else %}
+                                <span class="status-badge badge-secondary">{{ student.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ student.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-state-cell">
+                            <div class="empty-state-illustration">📭</div>
+                            <div class="empty-state-title">No students found</div>
+                            <p class="empty-state-text">
+                                {% if query or course_interest %}
+                                    No students match your current filters.
+                                {% else %}
+                                    Your student pipeline is empty – start by adding a new application.
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'students:add' %}" class="btn btn-primary">
+                                ➕ Add your first student
+                            </a>
+                            {% if query or course_interest %}
+                            <a href="{% url 'students:list' %}" class="btn btn-outline-secondary ms-2">
+                                Clear filters
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
